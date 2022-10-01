@@ -1,4 +1,4 @@
-const AWS = require("aws-sdk");
+/* const AWS = require("aws-sdk");
 const express = require("express");
 const serverless = require("serverless-http");
 const customerRoutes = require('./routes/customersRoutes')
@@ -71,3 +71,4 @@ app.use((req, res, next) => {
 
 
 module.exports.handler = serverless(app);
+ */

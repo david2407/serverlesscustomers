@@ -1,10 +1,15 @@
 org: david2407
 app: customersapi
 service: customersapi
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 custom:
-  customersTableName: 'customers-${sls:stage}'
+  customersTableName: "customers-${sls:stage}"
+  dynamodb:
+    start:
+      migrate: true
+    stages:
+      - dev
 
 provider:
   name: aws
@@ -21,15 +26,26 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - Fn::GetAtt: [ CustomersTable, Arn ]
+            - Fn::GetAtt: [CustomersTable, Arn]
   environment:
     CUSTOMERS_TABLE: ${self:custom.customersTableName}
 
 functions:
-  api:
-    handler: handler.handler
+  create:
+    handler: handlers/create.create
     events:
-      - httpApi: '*'
+      - http:
+          path: handlers
+          method: post
+          cors: true
+
+  getAllByCredits:
+    handler: handlers/getAllByCredits.getAllByCredits
+    events:
+      - http:
+          path: handlers 
+          method: get
+          cors: true
 
 resources:
   Resources:
@@ -44,3 +60,7 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.customersTableName}
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
