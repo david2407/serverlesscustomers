@@ -5,15 +5,10 @@ frameworkVersion: "3"
 
 custom:
   customersTableName: "customers-${sls:stage}"
-  dynamodb:
-    start:
-      migrate: true
-    stages:
-      - dev
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs12.x
   iam:
     role:
       statements:
@@ -35,16 +30,48 @@ functions:
     handler: handlers/create.create
     events:
       - http:
-          path: handlers
+          path: customers
           method: post
           cors: true
 
-  getAllByCredits:
-    handler: handlers/getAllByCredits.getAllByCredits
+  getById:
+    handler: handlers/get.get
     events:
       - http:
-          path: handlers 
+          path: customers/{id}
           method: get
+          cors: true
+
+  getByCredit:
+    handler: handlers/getAllByCredit.getAllByCredit
+    events:
+      - http:
+          path: customersByCredit
+          method: get
+          cors: true
+
+  update:
+    handler: handlers/update.update
+    events:
+      - http:
+          path: customers/{id}
+          method: put
+          cors: true
+
+  delete:
+    handler: handlers/delete.delete
+    events:
+      - http:
+          path: customers/{id}
+          method: delete
+          cors: true
+
+  putcredit:
+    handler: handlers/putCredit.putCredit
+    events:
+      - http:
+          path: credit/{id}
+          method: put
           cors: true
 
 resources:
@@ -60,7 +87,3 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.customersTableName}
-
-plugins:
-  - serverless-dynamodb-local
-  - serverless-offline
